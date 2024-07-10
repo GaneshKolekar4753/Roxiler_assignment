@@ -6,3 +6,5 @@ const router=express.Router();
 
 router.use("/seed",seedDataroute) //route to import data in db
 router.use("/product",productroute) //route to perform opertion products data 
+
+export default router;

@@ -9,8 +9,9 @@ export const getAllData = async (req, res) => {
     const data = await response.json();
     await Product.deleteMany();
     await Product.insertMany(data);
-    res.status(200).json({ msg: "DB seeded successfully" });
+    
+    res.status(200).json({ status:"Ok",msg: "DB seeded successfully" });
   } catch (error) {
-    res.status(500).json({ msg: "internal server error", err: error });
+    res.status(500).json({ msg: "internal server error", err: error.message });
   }
 };
