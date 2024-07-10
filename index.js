@@ -1,6 +1,6 @@
 import express from "express";
 import env from "dotenv";
-
+import dbConnect from "./config/mongoose.js";
 
 const app=express();
 env.config();
@@ -17,4 +17,5 @@ app.listen(process.env.PORT||7000,(err)=>{
         console.log("servere is not up:",err);
     }
     console.log(`server is up on port: ${process.env.PORT}`);
-})
+    dbConnect()
+});
