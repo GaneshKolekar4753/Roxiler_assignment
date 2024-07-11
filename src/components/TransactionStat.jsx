@@ -3,10 +3,31 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import MonthDropDown from './MonthDropdown';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 
 export default function TransactionStat() {
   const [month, setMonth] = useState(1);
+  const [stat,setStat]=useState([]);
+
+  const gettransactionsData = async () => {
+    const response = await fetch(
+      `http://localhost:5000/api/product/statistics/${month}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await response.json();
+    // console.log(data.data);
+    setStat(data.data);
+    return;
+  };
+
+  useEffect(()=>{
+    gettransactionsData();
+  },[month]);
   return (
     <>
     <div style={{marginTop:"3em"}}>
@@ -24,13 +45,13 @@ export default function TransactionStat() {
       }}
     >
       <ListItem>
-        <ListItemText primary={`Line item:  ${123445}`} />
+        <ListItemText primary={`Total Sale Amount:  ${stat.totalSaleAmount}`} />
       </ListItem>
       <ListItem>
-        <ListItemText primary={`Line item:  ${123445}`} />
+        <ListItemText primary={`Total sold item:  ${stat.totalSoldItems}`} />
       </ListItem>
       <ListItem>
-        <ListItemText primary={`Line item:  ${123445}`} />
+        <ListItemText primary={`Total unsold item:  ${stat.totalNotSoldItems}`} />
       </ListItem>
     </List>
 
