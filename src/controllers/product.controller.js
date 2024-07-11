@@ -35,7 +35,7 @@ export const getTransactionsMonthly = async (req, res) => {
 
 //total sale amount, total number of sold items and total number of not sold items of selected month
 export const getStatistics = async (req, res) => {
-  const { month } = req.query;
+  const month  = req.params.month;
   try {
     const transactions = await Product.find({
       $expr: {
@@ -63,7 +63,7 @@ export const getStatistics = async (req, res) => {
 
 //for bar-chart the response should contain price range and the number of items in that range for the selected month regardless of the year
 export const getBarChartData = async (req, res) => {
-  const { month } = req.query;
+  const month  = req.params.month;
 
   try {
     const transactions = await Product.find({
@@ -110,7 +110,7 @@ export const getBarChartData = async (req, res) => {
 
 // unique categories and number of items from that category for the selected month regardless of the year. eg. x category=20 item
 export const getPieChartData = async (req, res) => {
-  const { month } = req.query;
+  const month  = req.params.month;
 
   try {
     const transactions = await Product.find({
@@ -118,15 +118,22 @@ export const getPieChartData = async (req, res) => {
         $eq: [{ $month: "$dateOfSale" }, month],
       },
     });
-
-    const categories = transactions.reduce((total, transaction) => {
-      total[transaction.category] = (total[transaction.category] || 0) + 1;
-      return total;
-    }, {});
+// const categories = transactions.reduce((total, transaction) => {
+//       total[transaction.category] = (total[transaction.category] || 0) + 1;
+//       return total;
+//     },{});
+const categoryQuantities = Object.entries(
+  transactions.reduce((total, transaction) => {
+    total[transaction.category] = (total[transaction.category] || 0) + 1;
+    return total;
+  }, {})
+).map(([label, value]) => ({ label, value }));
+// console.log(categoryQuantities);
+    
     res.status(200).json({
       status: "Ok",
       msg: "send pie chart data successfully",
-      data: categories,
+      data: categoryQuantities,
     });
   } catch (error) {
     res.status(500).json({ msg: "internal server error", err: error.message });
@@ -135,7 +142,7 @@ export const getPieChartData = async (req, res) => {
 
 //API which fetches the data from all the 3 APIs (getStatistics,getBarChart,getPieChart) mentioned above, combines the response and sends a final response of the combined JSON
 export const getCombinedData = async (req, res) => {
-  const { month } = req.query;
+  const month  = req.params.month;
   try {
     const statistics= await getStatistics(req, res);
     const barChart= await getBarChartData(req, res);
